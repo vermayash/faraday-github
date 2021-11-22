@@ -13,10 +13,11 @@ interface Repositories {
 const App: React.FC = () => {
   const [repositories, setRepositories] = useState<Repositories[]>();
   const [totalRepositories, setTotalRepositories] = useState(0);
+  const [pageNumber, setPageNumber] = useState(1);
 
   const fetchData = async () => {
     const { data } = await axios.get(
-      "https://api.github.com/users/faradayio/repos"
+      `https://api.github.com/users/faradayio/repos?per_page=28&page=${pageNumber}`
     );
 
     setRepositories(data);
@@ -40,16 +41,45 @@ const App: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [pageNumber]);
 
   return (
     <div>
       <Header />
       <div className="container pt-3">
         <p className="lead text-left">
-          Total {totalRepositories} repositories found.
+          Showing {totalRepositories} repositories.
         </p>
-        <div className="d-flex flex-wrap gap-3">{renderRepositories}</div>
+        <div className="d-flex flex-wrap gap-3 justify-content-center">
+          {renderRepositories}
+        </div>
+
+        <div className="d-flex justify-content-center p-3 gap-3">
+          <input
+            type="button"
+            value="Back Page"
+            className="btn btn-secondary"
+            onClick={() =>
+              pageNumber > 1 ? setPageNumber(pageNumber - 1) : ""
+            }
+          />
+
+          <input
+            readOnly
+            type="text"
+            className="btn btn-secondary"
+            value={`Page no. - ${pageNumber}`}
+          />
+
+          <input
+            type="button"
+            value="Next Page"
+            className="btn btn-secondary"
+            onClick={() =>
+              totalRepositories == 28 ? setPageNumber(pageNumber + 1) : ""
+            }
+          />
+        </div>
       </div>
       <p className="lead text-center mt-4">Reached the end of the page.</p>
     </div>
